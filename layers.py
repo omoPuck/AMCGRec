@@ -115,13 +115,17 @@ class GraphContrastLayer(Layer):
             initial_pos = tf.nn.embedding_lookup(initial_emb[i], self.placeholders["pos_" + self.tag])
             # initial_neg = tf.nn.embedding_lookup(initial_emb[i], self.placeholders["neg_" + self.tag])
             struc_pos = tf.nn.embedding_lookup(struc_emb[i], self.placeholders["pos_" + self.tag])
-            struc_neg = tf.nn.embedding_lookup(struc_emb[i], self.placeholders["neg_" + self.tag][i])
+
+            initial_neg = tf.nn.embedding_lookup(initial_emb[i], self.placeholders["neg_" + self.tag][i])
+
+            # struc_neg = tf.nn.embedding_lookup(struc_emb[i], self.placeholders["neg_" + self.tag][i])
+
             L2_initial_pos = tf.nn.l2_normalize(initial_pos,axis=2)
             # L2_initial_neg = tf.nn.l2_normalize(initial_neg,axis=2)
             L2_struc_pos = tf.nn.l2_normalize(struc_pos,axis=2)
-            L2_struc_neg = tf.nn.l2_normalize(struc_neg,axis=2)
-            pos_cos = get_cosine_similarity(L2_initial_pos, L2_struc_pos)
-            neg_cos = get_cosine_similarity(L2_initial_pos, L2_struc_neg)
+            L2_initial_neg = tf.nn.l2_normalize(initial_neg,axis=2)
+            pos_cos = get_cosine_similarity(L2_struc_pos,L2_initial_pos)
+            neg_cos = get_cosine_similarity(L2_struc_pos, L2_initial_neg)
             totol_los += (-tf.reduce_mean(tf.log(new_softmax(pos_cos, neg_cos, FLAGS.tau))))
 
         return totol_los
